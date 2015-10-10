@@ -1,0 +1,47 @@
+package com.example.massivcode.simplayer.Fragment;
+
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.example.massivcode.simplayer.R;
+
+/**
+ * Created by massivCode on 2015-10-10.
+ */
+public class MiniPlayerInfoFragment extends android.support.v4.app.Fragment {
+
+    private ImageView mMiniPlayerAlbumArtImageView;
+    private TextView mMiniPlayerTitleTextView, mMiniPlayerArtistTextView;
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.fragment_mini_player_info, container, false);
+        initView(view);
+
+        return view;
+    }
+
+    private void initView(View view) {
+        mMiniPlayerAlbumArtImageView = (ImageView)view.findViewById(R.id.mini_player_album_art_iv);
+        mMiniPlayerTitleTextView = (TextView)view.findViewById(R.id.mini_player_title_tv);
+        mMiniPlayerArtistTextView = (TextView)view.findViewById(R.id.mini_player_artist_tv);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mMiniPlayerAlbumArtImageView.setOnClickListener((View.OnClickListener) getActivity());
+        mMiniPlayerTitleTextView.setOnClickListener((View.OnClickListener)getActivity());
+        mMiniPlayerArtistTextView.setOnClickListener((View.OnClickListener)getActivity());
+
+    }
+
+}
