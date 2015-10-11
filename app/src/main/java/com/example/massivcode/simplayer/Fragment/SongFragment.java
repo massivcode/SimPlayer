@@ -8,11 +8,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.example.massivcode.simplayer.Adapter.SongAdapter;
 import com.example.massivcode.simplayer.R;
+import com.example.massivcode.simplayer.Util.MusicInfoUtil;
 
 /**
  * Created by massivCode on 2015-10-10.
@@ -38,14 +40,10 @@ public class SongFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        String[] projection = new String[]{MediaStore.Audio.Media._ID,
-                MediaStore.Audio.Media.TITLE,
-                MediaStore.Audio.Media.ARTIST,
-                MediaStore.Audio.Media.DURATION};
-
-        Cursor cursor = getActivity().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, null, null, null);
+        Cursor cursor = getActivity().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, MusicInfoUtil.projection, null, null, null);
         mAdapter = new SongAdapter(getActivity().getApplicationContext(), cursor, true);
         mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener((AdapterView.OnItemClickListener)getActivity());
 
     }
 

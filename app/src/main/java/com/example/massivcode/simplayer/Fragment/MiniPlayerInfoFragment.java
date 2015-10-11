@@ -1,22 +1,39 @@
 package com.example.massivcode.simplayer.Fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.massivcode.simplayer.Activity.MainActivity;
+import com.example.massivcode.simplayer.Database.Model.MusicInfo;
 import com.example.massivcode.simplayer.R;
+import com.example.massivcode.simplayer.listener.FragmentCommunicator;
 
 /**
  * Created by massivCode on 2015-10-10.
  */
-public class MiniPlayerInfoFragment extends android.support.v4.app.Fragment {
+public class MiniPlayerInfoFragment extends android.support.v4.app.Fragment implements FragmentCommunicator{
 
+    private static final String TAG = MiniPlayerInfoFragment.class.getSimpleName();
     private ImageView mMiniPlayerAlbumArtImageView;
     private TextView mMiniPlayerTitleTextView, mMiniPlayerArtistTextView;
+    private MusicInfo mMusicInfo;
+
+
+    @Override
+    public void onAttach(Activity activity){
+        super.onAttach(activity);
+        Context context = getActivity();
+        ((MainActivity)context).fragmentCommunicator = this;
+        Log.d(TAG, "onAttach");
+    }
 
     @Nullable
     @Override
@@ -24,7 +41,7 @@ public class MiniPlayerInfoFragment extends android.support.v4.app.Fragment {
 
         View view = inflater.inflate(R.layout.fragment_mini_player_info, container, false);
         initView(view);
-
+        Log.d(TAG, "onCreateView");
         return view;
     }
 
@@ -32,6 +49,7 @@ public class MiniPlayerInfoFragment extends android.support.v4.app.Fragment {
         mMiniPlayerAlbumArtImageView = (ImageView)view.findViewById(R.id.mini_player_album_art_iv);
         mMiniPlayerTitleTextView = (TextView)view.findViewById(R.id.mini_player_title_tv);
         mMiniPlayerArtistTextView = (TextView)view.findViewById(R.id.mini_player_artist_tv);
+
     }
 
     @Override
@@ -40,8 +58,22 @@ public class MiniPlayerInfoFragment extends android.support.v4.app.Fragment {
 
         mMiniPlayerAlbumArtImageView.setOnClickListener((View.OnClickListener) getActivity());
         mMiniPlayerTitleTextView.setOnClickListener((View.OnClickListener)getActivity());
-        mMiniPlayerArtistTextView.setOnClickListener((View.OnClickListener)getActivity());
+        mMiniPlayerArtistTextView.setOnClickListener((View.OnClickListener) getActivity());
+
+        if(mMusicInfo != null) {
+            mMiniPlayerTitleTextView.setText(mMusicInfo.getTitle());
+            mMiniPlayerArtistTextView.setText(mMusicInfo.getArtist());
+        }
+
+        Log.d(TAG, "onActivityCreated");
 
     }
 
+
+    @Override
+    public void passDataToFragment(MusicInfo info) {
+        mMusicInfo = info;
+        mMiniPlayerTitleTextView.setText(mMusicInfo.getTitle());
+        mMiniPlayerArtistTextView.setText(mMusicInfo.getArtist());
+    }
 }

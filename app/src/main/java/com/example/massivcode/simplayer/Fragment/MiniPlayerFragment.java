@@ -2,6 +2,7 @@ package com.example.massivcode.simplayer.Fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import com.example.massivcode.simplayer.R;
  */
 public class MiniPlayerFragment extends android.support.v4.app.Fragment {
 
+    private static final String TAG = MiniPlayerFragment.class.getSimpleName();
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -23,6 +26,7 @@ public class MiniPlayerFragment extends android.support.v4.app.Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Log.d(TAG, "onActivityCreated");
     }
 
 }

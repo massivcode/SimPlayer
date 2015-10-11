@@ -28,6 +28,7 @@
     </LinearLayout>
 
     <ImageView
+        android:id="@+id/player_album_art_iv"
         android:layout_weight="1"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_image_audiotrack"
@@ -35,6 +36,7 @@
         android:layout_height="match_parent" />
 
     <SeekBar
+        android:id="@+id/player_seekbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
@@ -43,6 +45,7 @@
        android:layout_height="wrap_content">
 
        <TextView
+           android:id="@+id/player_current_time_tv"
            android:layout_marginLeft="8dp"
        android:textColor="#FFFFFF"
        android:text="0:00"
@@ -50,6 +53,7 @@
        android:layout_height="wrap_content" />
 
        <TextView
+           android:id="@+id/player_duration_tv"
            android:layout_marginRight="8dp"
            android:layout_alignParentRight="true"
            android:textColor="#FFFFFF"

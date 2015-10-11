@@ -57,7 +57,7 @@ public class MainFragment extends android.support.v4.app.Fragment {
         mList.add(new ArtistFragment());
         mList.add(new SongFragment());
 
-        mAdapter = new CategoryAdapter(getActivity().getSupportFragmentManager(), mList);
+        mAdapter = new CategoryAdapter(getChildFragmentManager(), mList);
         mViewPager.setAdapter(mAdapter);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
         mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
