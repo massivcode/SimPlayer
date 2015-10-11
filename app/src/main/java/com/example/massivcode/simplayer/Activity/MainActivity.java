@@ -25,7 +25,7 @@ import com.example.massivcode.simplayer.listener.FragmentCommunicator;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
 
-    private static final String TAG = MainActivity.class.getSimpleName() ;
+    private static final String TAG = MainActivity.class.getSimpleName();
     private Intent mServiceIntent;
 
     FragmentManager mFragmentManager;
@@ -90,18 +90,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.mini_player_next_btn:
                 Toast.makeText(MainActivity.this, "다음 버튼이 눌렸습니다.", Toast.LENGTH_SHORT).show();
                 break;
+
         }
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        MusicInfo info = MusicInfoUtil.getSelectedMusicInfo(MainActivity.this, (Cursor)parent.getAdapter().getItem(position));
+        MusicInfo info = MusicInfoUtil.getSelectedMusicInfo(MainActivity.this, (Cursor) parent.getAdapter().getItem(position));
         Uri uri = info.getUri();
         Intent intent = new Intent(MainActivity.this, MusicService.class);
         intent.setAction(MusicService.ACTION_PLAY);
         intent.setData(uri);
         startService(intent);
-        if(fragmentCommunicator != null) {
+        if (fragmentCommunicator != null) {
             fragmentCommunicator.passDataToFragment(info);
         }
 
