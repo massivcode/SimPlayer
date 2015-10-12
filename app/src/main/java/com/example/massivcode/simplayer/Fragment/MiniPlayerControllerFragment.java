@@ -55,9 +55,9 @@ public class MiniPlayerControllerFragment extends android.support.v4.app.Fragmen
     @Override
     public void passConditionToFragment(Boolean mediaIsPlaying) {
         if(mediaIsPlaying) {
-            mMiniPlayerPlayButton.setBackgroundResource(R.drawable.ic_av_pause);
+            mMiniPlayerPlayButton.setSelected(false);
         } else {
-            mMiniPlayerPlayButton.setBackgroundResource(R.drawable.ic_av_play_arrow);
+            mMiniPlayerPlayButton.setSelected(true);
         }
     }
 }

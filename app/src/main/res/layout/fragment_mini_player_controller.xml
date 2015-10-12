@@ -13,7 +13,7 @@
 
     <Button
         android:id="@+id/mini_player_play_btn"
-        android:background="@drawable/ic_av_play_arrow"
+        android:background="@drawable/selector_play"
         android:layout_width="48dp"
         android:layout_height="54dp" />
 

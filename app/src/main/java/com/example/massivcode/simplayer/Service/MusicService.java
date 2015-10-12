@@ -43,6 +43,8 @@ public class MusicService extends Service {
             String action = intent.getAction();
             Uri uri = intent.getData();
 
+
+
         switch (action) {
             case ACTION_PLAY:
                 if(!mMediaPlayer.isPlaying()) {
@@ -51,6 +53,10 @@ public class MusicService extends Service {
                         mMediaPlayer.setDataSource(getApplicationContext(), uri);
                         mMediaPlayer.prepare();
                         mMediaPlayer.start();
+                        if(mTest != null) {
+
+                            mTest.getCurrentPosition(mMediaPlayer.getCurrentPosition());
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -61,6 +67,10 @@ public class MusicService extends Service {
                         mMediaPlayer.setDataSource(getApplicationContext(), uri);
                         mMediaPlayer.prepare();
                         mMediaPlayer.start();
+                        if(mTest != null) {
+
+                            mTest.getCurrentPosition(mMediaPlayer.getCurrentPosition());
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -68,6 +78,10 @@ public class MusicService extends Service {
                 break;
             case ACTION_PAUSE:
                 if(mMediaPlayer.isPlaying()) {
+                    if(mTest != null) {
+
+                        mTest.getCurrentPosition(mMediaPlayer.getCurrentPosition());
+                    }
                     mMediaPlayer.pause();
                 } else {
                     mMediaPlayer.start();
@@ -118,6 +132,16 @@ public class MusicService extends Service {
          } else {
             return null;
         }
+    }
+
+    public interface TestListener {
+        public void getCurrentPosition(int currentPosition);
+    }
+
+    private TestListener mTest;
+
+    public void setOnTestListener(TestListener listener) {
+        mTest = listener;
     }
 
 
