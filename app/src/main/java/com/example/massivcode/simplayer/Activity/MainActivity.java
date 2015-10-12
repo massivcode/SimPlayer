@@ -74,11 +74,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.mini_player_album_art_iv:
             case R.id.mini_player_artist_tv:
             case R.id.mini_player_title_tv:
-                mFragmentTransaction = mFragmentManager.beginTransaction();
-                mFragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                mFragmentTransaction.replace(R.id.main_container, mPlayerFragment);
-                mFragmentTransaction.addToBackStack(null);
-                mFragmentTransaction.commit();
+//                mFragmentTransaction = mFragmentManager.beginTransaction();
+//                mFragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//                mFragmentTransaction.replace(R.id.main_container, mPlayerFragment);
+//                mFragmentTransaction.addToBackStack(null);
+//                mFragmentTransaction.commit();
+                Intent intent = new Intent(this, PlayerActivity.class);
+                intent.putExtra("info", mCurrentInfo);
+                startActivity(intent);
                 break;
 
             case R.id.mini_player_previous_btn:
@@ -94,9 +97,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private MusicInfo mCurrentInfo;
+
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         MusicInfo info = MusicInfoUtil.getSelectedMusicInfo(MainActivity.this, (Cursor) parent.getAdapter().getItem(position));
+        mCurrentInfo = info;
         Uri uri = info.getUri();
         Intent intent = new Intent(MainActivity.this, MusicService.class);
         intent.setAction(MusicService.ACTION_PLAY);

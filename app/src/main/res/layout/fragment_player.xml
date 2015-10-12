@@ -11,13 +11,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <fragment
+        <include
             android:id="@+id/player_mini_player_info"
-            android:layout_weight="1"
-            class="com.example.massivcode.simplayer.Fragment.MiniPlayerInfoFragment"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            tools:layout="@layout/fragment_mini_player_info" />
+            android:layout_weight="1"
+            layout="@layout/fragment_mini_player_info" />
         
         <Button
             android:id="@+id/player_queue_music_btn"
