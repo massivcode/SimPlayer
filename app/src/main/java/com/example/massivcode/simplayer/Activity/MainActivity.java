@@ -17,11 +17,11 @@ import android.widget.Toast;
 
 import com.example.massivcode.simplayer.Database.Model.MusicInfo;
 import com.example.massivcode.simplayer.Fragment.MainFragment;
-import com.example.massivcode.simplayer.Fragment.PlayerFragment;
 import com.example.massivcode.simplayer.R;
 import com.example.massivcode.simplayer.Service.MusicService;
 import com.example.massivcode.simplayer.Util.MusicInfoUtil;
 import com.example.massivcode.simplayer.listener.FragmentCommunicator;
+import com.example.massivcode.simplayer.listener.MediaPlayerStateToFragment;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
 
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     };
 
     public FragmentCommunicator fragmentCommunicator;
+    public MediaPlayerStateToFragment mediaPlayerStateToFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +60,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bindService(mServiceIntent, mConnection, BIND_AUTO_CREATE);
 
         mFragmentManager = getSupportFragmentManager();
-        mPlayerFragment = new PlayerFragment();
         mMainFragment = new MainFragment();
 
-        mFragmentTransaction = mFragmentManager.beginTransaction();
-        mFragmentTransaction.add(R.id.main_container, mMainFragment);
-        mFragmentTransaction.commit();
+        if(savedInstanceState == null) {
+            mFragmentTransaction = mFragmentManager.beginTransaction();
+            mFragmentTransaction.add(R.id.main_container, mMainFragment);
+            mFragmentTransaction.commit();
+        }
+
 
     }
 
@@ -79,9 +82,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                mFragmentTransaction.replace(R.id.main_container, mPlayerFragment);
 //                mFragmentTransaction.addToBackStack(null);
 //                mFragmentTransaction.commit();
-                Intent intent = new Intent(this, PlayerActivity.class);
-                intent.putExtra("info", mCurrentInfo);
-                startActivity(intent);
+                if(mCurrentInfo != null) {
+                    Intent intent = new Intent(this, PlayerActivity.class);
+                    intent.putExtra("info", mCurrentInfo);
+                    startActivity(intent);
+                }
                 break;
 
             case R.id.mini_player_previous_btn:
@@ -89,6 +94,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.mini_player_play_btn:
                 Toast.makeText(MainActivity.this, "재생 버튼이 눌렸습니다.", Toast.LENGTH_SHORT).show();
+                Intent pauseMusic = new Intent(MainActivity.this, MusicService.class);
+                pauseMusic.setAction(MusicService.ACTION_PAUSE);
+                startService(pauseMusic);
+
+                if(mediaPlayerStateToFragment != null) {
+                    mediaPlayerStateToFragment.passConditionToFragment(mMusicService.isPlaying());
+                }
                 break;
             case R.id.mini_player_next_btn:
                 Toast.makeText(MainActivity.this, "다음 버튼이 눌렸습니다.", Toast.LENGTH_SHORT).show();
@@ -97,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private MusicInfo mCurrentInfo;
+    private MusicInfo mCurrentInfo = null;
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -109,7 +121,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.setData(uri);
         startService(intent);
         if (fragmentCommunicator != null) {
-            fragmentCommunicator.passDataToFragment(info);
+            fragmentCommunicator.passDataToFragment(mCurrentInfo);
+        }
+        if(mediaPlayerStateToFragment != null) {
+            mediaPlayerStateToFragment.passConditionToFragment(mMusicService.isPlaying());
         }
 
     }

@@ -40,8 +40,8 @@ public class MusicService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String action = intent.getAction();
-        Uri uri = intent.getData();
+            String action = intent.getAction();
+            Uri uri = intent.getData();
 
         switch (action) {
             case ACTION_PLAY:
@@ -67,6 +67,11 @@ public class MusicService extends Service {
                 }
                 break;
             case ACTION_PAUSE:
+                if(mMediaPlayer.isPlaying()) {
+                    mMediaPlayer.pause();
+                } else {
+                    mMediaPlayer.start();
+                }
                 break;
             case ACTION_PREVIOUS:
                 break;
@@ -98,4 +103,23 @@ public class MusicService extends Service {
     public boolean onUnbind(Intent intent) {
         return super.onUnbind(intent);
     }
+
+    public boolean isPlaying() {
+        if(mMediaPlayer != null) {
+            return mMediaPlayer.isPlaying();
+        } else {
+            return false;
+        }
+    }
+
+    public MediaPlayer getMediaPlayer() {
+        if(mMediaPlayer != null) {
+            return mMediaPlayer;
+         } else {
+            return null;
+        }
+    }
+
+
+
 }

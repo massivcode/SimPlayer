@@ -2,11 +2,14 @@ package com.example.massivcode.simplayer.Util;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
 
 import com.example.massivcode.simplayer.Database.Model.MusicInfo;
+import com.example.massivcode.simplayer.R;
 
 /**
  * Created by massivCode on 2015-10-11.
@@ -57,6 +60,57 @@ public class MusicInfoUtil {
 
         return musicInfo;
 
+    }
+
+    public static Bitmap getBitmap( Context context, byte[] albumArt, int quality) {
+        // Bitmap 샘플링
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = quality; // 2의 배수
+
+        Bitmap bitmap = null;
+        if (null != albumArt) {
+            bitmap = BitmapFactory.decodeByteArray(albumArt, 0, albumArt.length, options);
+        } else {
+            bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_image_audiotrack);
+        }
+
+        // id 로부터 bitmap 생성
+        return bitmap;
+    }
+
+    public static String getTime(String duration) {
+
+        long milliSeconds = Long.parseLong(duration);
+        int totalSeconds = (int)(milliSeconds / 1000);
+
+        int hour = totalSeconds / 3600;
+        int minute = (totalSeconds - (hour * 3600)) / 60;
+        int second = (totalSeconds - ((hour * 3600) + (minute * 60)));
+
+
+        return formattedTime(hour, minute, second);
+    }
+
+    private static String formattedTime(int hour, int minute, int second) {
+        String result = "";
+
+        if(hour > 0) {
+            result = hour + ":";
+        }
+
+        if(minute >= 10) {
+            result = result + minute + ":";
+        } else {
+            result = result + "0" + minute + ":";
+        }
+
+        if(second >= 10) {
+            result = result + second;
+        } else {
+            result = result + "0" + second;
+        }
+
+        return result;
     }
 
 }

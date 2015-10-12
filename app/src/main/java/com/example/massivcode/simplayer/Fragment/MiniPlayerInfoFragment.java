@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.example.massivcode.simplayer.Activity.MainActivity;
 import com.example.massivcode.simplayer.Database.Model.MusicInfo;
 import com.example.massivcode.simplayer.R;
+import com.example.massivcode.simplayer.Util.MusicInfoUtil;
 import com.example.massivcode.simplayer.listener.FragmentCommunicator;
 
 /**
@@ -57,7 +58,7 @@ public class MiniPlayerInfoFragment extends android.support.v4.app.Fragment impl
         super.onActivityCreated(savedInstanceState);
 
         mMiniPlayerAlbumArtImageView.setOnClickListener((View.OnClickListener) getActivity());
-        mMiniPlayerTitleTextView.setOnClickListener((View.OnClickListener)getActivity());
+        mMiniPlayerTitleTextView.setOnClickListener((View.OnClickListener) getActivity());
         mMiniPlayerArtistTextView.setOnClickListener((View.OnClickListener) getActivity());
 
         if(mMusicInfo != null) {
@@ -65,7 +66,8 @@ public class MiniPlayerInfoFragment extends android.support.v4.app.Fragment impl
             mMiniPlayerArtistTextView.setText(mMusicInfo.getArtist());
         }
 
-        Log.d(TAG, "onActivityCreated");
+
+
 
     }
 
@@ -73,7 +75,12 @@ public class MiniPlayerInfoFragment extends android.support.v4.app.Fragment impl
     @Override
     public void passDataToFragment(MusicInfo info) {
         mMusicInfo = info;
+        Log.d(TAG, ""+info);
         mMiniPlayerTitleTextView.setText(mMusicInfo.getTitle());
         mMiniPlayerArtistTextView.setText(mMusicInfo.getArtist());
+        mMiniPlayerAlbumArtImageView.setImageBitmap(MusicInfoUtil.getBitmap(getActivity(), mMusicInfo.getAlbumArt(), 4));
     }
+
+
+
 }

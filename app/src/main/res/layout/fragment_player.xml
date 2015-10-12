@@ -67,6 +67,7 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/player_repeat_btn"
             android:layout_weight="1"
             android:layout_marginLeft="10dp"
             android:background="@drawable/ic_av_replay"
@@ -74,24 +75,28 @@
             android:layout_height="42dp" />
 
         <Button
+            android:id="@+id/player_previous_btn"
             android:layout_weight="1"
             android:background="@drawable/ic_av_skip_previous"
             android:layout_width="42dp"
             android:layout_height="42dp" />
 
         <Button
+            android:id="@+id/player_play_btn"
             android:layout_weight="1"
             android:background="@drawable/ic_av_play_arrow"
             android:layout_width="54dp"
             android:layout_height="54dp" />
 
         <Button
+            android:id="@+id/player_next_btn"
             android:layout_weight="1"
             android:background="@drawable/ic_av_skip_next"
             android:layout_width="42dp"
             android:layout_height="42dp" />
 
         <Button
+            android:id="@+id/player_shuffle_btn"
             android:layout_weight="1"
             android:layout_marginRight="10dp"
             android:background="@drawable/ic_av_shuffle"

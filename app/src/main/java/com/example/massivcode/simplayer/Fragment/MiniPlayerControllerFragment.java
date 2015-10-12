@@ -1,5 +1,7 @@
 package com.example.massivcode.simplayer.Fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -8,15 +10,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.example.massivcode.simplayer.Activity.MainActivity;
 import com.example.massivcode.simplayer.R;
+import com.example.massivcode.simplayer.listener.MediaPlayerStateToFragment;
 
 /**
  * Created by massivCode on 2015-10-10.
  */
-public class MiniPlayerControllerFragment extends android.support.v4.app.Fragment {
+public class MiniPlayerControllerFragment extends android.support.v4.app.Fragment implements MediaPlayerStateToFragment {
 
     private static final String TAG = MiniPlayerControllerFragment.class.getSimpleName();
     private Button mMiniPlayerPreviousButton, mMiniPlayerPlayButton, mMiniPlayerNextButton;
+
+
+    @Override
+    public void onAttach(Activity activity){
+        super.onAttach(activity);
+        Context context = getActivity();
+        ((MainActivity)context).mediaPlayerStateToFragment = this;
+        Log.d(TAG, "onAttach");
+    }
 
     @Nullable
     @Override
@@ -38,4 +51,13 @@ public class MiniPlayerControllerFragment extends android.support.v4.app.Fragmen
         Log.d(TAG, "onAc");
     }
 
+
+    @Override
+    public void passConditionToFragment(Boolean mediaIsPlaying) {
+        if(mediaIsPlaying) {
+            mMiniPlayerPlayButton.setBackgroundResource(R.drawable.ic_av_pause);
+        } else {
+            mMiniPlayerPlayButton.setBackgroundResource(R.drawable.ic_av_play_arrow);
+        }
+    }
 }

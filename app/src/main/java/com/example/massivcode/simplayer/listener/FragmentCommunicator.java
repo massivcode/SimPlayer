@@ -7,4 +7,5 @@ import com.example.massivcode.simplayer.Database.Model.MusicInfo;
  */
 public interface FragmentCommunicator {
     public void passDataToFragment(MusicInfo info);
+
 }

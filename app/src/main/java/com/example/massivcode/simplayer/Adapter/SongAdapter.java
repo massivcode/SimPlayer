@@ -73,14 +73,16 @@ public class SongAdapter extends CursorAdapter implements AsyncBitmapLoader.Bitm
         long id = getItemId(position);
         Cursor cursor = getCursor();
 
-        // Bitmap 샘플링
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 4; // 2의 배수
 
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(mContext, Uri.parse("content://media/external/audio/media/" + id));
 
-       byte[] albumArt =  retriever.getEmbeddedPicture();
+        byte[] albumArt =  retriever.getEmbeddedPicture();
+
+        // Bitmap 샘플링
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 4; // 2의 배수
+
         Bitmap bitmap = null;
         if (null != albumArt) {
             bitmap = BitmapFactory.decodeByteArray(albumArt, 0, albumArt.length, options);
