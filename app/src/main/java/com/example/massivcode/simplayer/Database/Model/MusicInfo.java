@@ -17,6 +17,16 @@ public class MusicInfo implements Parcelable{
     private byte[] albumArt;
     private String duration;
 
+    public MusicInfo(long _id, Uri uri, String artist, String title, String album, String duration) {
+        this._id = _id;
+        this.uri = uri;
+        this.artist = artist;
+        this.title = title;
+        this.album = album;
+        this.duration = duration;
+    }
+
+
     public MusicInfo(long _id, Uri uri, String artist, String title, String album, byte[] albumArt, String duration) {
         this._id = _id;
         this.uri = uri;

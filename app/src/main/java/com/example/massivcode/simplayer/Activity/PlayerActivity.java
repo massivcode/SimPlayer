@@ -3,11 +3,9 @@ package com.example.massivcode.simplayer.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -22,7 +20,7 @@ import com.example.massivcode.simplayer.Util.MusicInfoUtil;
 /**
  * Created by junsuk on 2015. 10. 12..
  */
-public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener, MusicService.TestListener {
+public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener {
 
     private static final String TAG = PlayerActivity.class.getSimpleName();
     private TextView mTitleTextView;
@@ -47,7 +45,7 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
             if(mService.getMediaPlayer().isPlaying()) {
                 mPlayButton.setSelected(true);
             }
-            mService.setOnTestListener(PlayerActivity.this);
+
         }
 
         @Override
@@ -135,16 +133,6 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
 
             case R.id.player_play_btn:
 
-                if(mService.getMediaPlayer().isPlaying()) {
-                    mPlayButton.setSelected(false);
-                } else {
-                    mPlayButton.setSelected(true);
-                }
-
-                Intent pauseMusic = new Intent(PlayerActivity.this, MusicService.class);
-                pauseMusic.setAction(MusicService.ACTION_PAUSE);
-                pauseMusic.setData(null);
-                startService(pauseMusic);
 
                 break;
 
@@ -166,48 +154,5 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
         unbindService(mConnection);
     }
 
-    @Override
-    public void getCurrentPosition(final int currentPosition) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Log.d(TAG, "" + currentPosition);
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
 
-    }
-
-    private class UpdateAsync extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            Log.d(TAG, "case1");
-            while(true) {
-                publishProgress();
-
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                   break;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            Log.d(TAG, "case2");
-            if(mSeekBar.getProgress() == mService.getMediaPlayer().getDuration()) {
-                Log.d(TAG, "case3");
-                mCurrentTimeTextView.setText(MusicInfoUtil.getTime(String.valueOf(mService.getMediaPlayer().getCurrentPosition())));
-                mSeekBar.setProgress(mService.getMediaPlayer().getCurrentPosition());
-            }
-            super.onProgressUpdate(values);
-        }
-    }
 }
