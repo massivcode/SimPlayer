@@ -34,8 +34,13 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+        if(mTest != null) {
+            mTest.test(mp);
+        }
+
             int lastPosition = mp.getCurrentPosition();
             int duration = mp.getDuration();
+        Log.d(TAG, "더 빨리 호출됨: " + (duration-lastPosition));
 
             mp.pause();
             mp.reset();
@@ -267,6 +272,16 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     }
     public void setOnCurrentInfoToPlayerActivity(CurrentInfoCommunicator listener) {
         communicatorToPlayerActivity = listener;
+    }
+
+    public interface Test {
+        void test(MediaPlayer mediaPlayer);
+    }
+
+    public Test mTest = null;
+
+    public void setOnTest(Test listener) {
+        mTest = listener;
     }
 
     public boolean isReady() {

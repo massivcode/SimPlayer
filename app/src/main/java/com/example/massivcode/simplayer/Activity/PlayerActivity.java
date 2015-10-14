@@ -3,6 +3,7 @@ package com.example.massivcode.simplayer.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
@@ -22,7 +23,7 @@ import com.example.massivcode.simplayer.Util.MusicInfoUtil;
 /**
  * Created by junsuk on 2015. 10. 12..
  */
-public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener, MusicService.CurrentInfoCommunicator {
+public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener, MusicService.CurrentInfoCommunicator, MusicService.Test {
 
     private static final String TAG = PlayerActivity.class.getSimpleName();
     private TextView mTitleTextView;
@@ -33,6 +34,8 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
     private TextView mCurrentTimeTextView, mDurrationTextView;
 
     private Button mRepeatButton, mPreviousButton, mPlayButton, mNextButton, mShuffleButton;
+
+    private Timer mTimer;
 
 
     private MusicService mMusicService = null;
@@ -51,7 +54,9 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
             }
 
             mMusicService.setOnCurrentInfoToPlayerActivity(PlayerActivity.this);
-            new Timer(mMusicService.getMediaPlayer().getDuration(), 1000).start();
+            mMusicService.setOnTest(PlayerActivity.this);
+           mTimer =  new Timer(mMusicService.getMediaPlayer().getDuration(), 1000);
+            mTimer.start();
 
         }
 
@@ -208,6 +213,14 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
         mAlbumArtImageVIew.setImageBitmap(MusicInfoUtil.getBitmap(this, info.getUri(), 4));
         mAlbumArtBigImageView.setImageBitmap(MusicInfoUtil.getBitmap(this, info.getUri(), 1));
         mDurrationTextView.setText(MusicInfoUtil.getTime(info.getDuration()));
+    }
+
+    @Override
+    public void test(MediaPlayer mediaPlayer) {
+        mTimer.cancel();
+        mTimer =  new Timer(mMusicService.getMediaPlayer().getDuration(), 1000);
+        mTimer.start();
+
     }
 
     public class Timer extends CountDownTimer {

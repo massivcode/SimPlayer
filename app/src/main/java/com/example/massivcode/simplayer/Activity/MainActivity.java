@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     };
 
     public FragmentCommunicator currentMusicInfoToMiniPlayerInfo;
-    public MediaPlayerStateToFragment currentMediaplayerStateToMiniPlayerController;
+    public MediaPlayerStateToFragment currentMediaPlayerStateToMiniPlayerController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,12 +109,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 break;
             case R.id.mini_player_play_btn:
-                if(currentMediaplayerStateToMiniPlayerController != null) {
+                if(currentMediaPlayerStateToMiniPlayerController != null) {
                     if (mMusicService != null & mMusicService.isReady()) {
                         if(mMusicService.getMediaPlayer().isPlaying()) {
-                            currentMediaplayerStateToMiniPlayerController.passConditionToFragment(false);
+                            currentMediaPlayerStateToMiniPlayerController.passConditionToFragment(false);
                         } else {
-                            currentMediaplayerStateToMiniPlayerController.passConditionToFragment(true);
+                            currentMediaPlayerStateToMiniPlayerController.passConditionToFragment(true);
                         }
 
                     }
@@ -153,9 +153,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 playAllIntent.putExtra("position", 0);
                 startService(playAllIntent);
 
-                if(currentMediaplayerStateToMiniPlayerController != null) {
+                if(currentMediaPlayerStateToMiniPlayerController != null) {
                     if (mMusicService != null) {
-                        currentMediaplayerStateToMiniPlayerController.passConditionToFragment(true);
+                        currentMediaPlayerStateToMiniPlayerController.passConditionToFragment(true);
 
                     }
                 }
@@ -175,9 +175,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("position", 0);
         startService(intent);
 
-        if(currentMediaplayerStateToMiniPlayerController != null) {
+        if(currentMediaPlayerStateToMiniPlayerController != null) {
             if (mMusicService != null) {
-                currentMediaplayerStateToMiniPlayerController.passConditionToFragment(true);
+                currentMediaPlayerStateToMiniPlayerController.passConditionToFragment(true);
 
             }
         }
@@ -201,10 +201,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onRestart() {
         super.onRestart();
-        if(currentMediaplayerStateToMiniPlayerController != null) {
+        if(currentMediaPlayerStateToMiniPlayerController != null) {
             if(mMusicService != null) {
 
-                currentMediaplayerStateToMiniPlayerController.passConditionToFragment(mMusicService.getMediaPlayer().isPlaying());
+                currentMediaPlayerStateToMiniPlayerController.passConditionToFragment(mMusicService.getMediaPlayer().isPlaying());
             }
 
         }
@@ -213,9 +213,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        if(currentMediaplayerStateToMiniPlayerController != null) {
+        if(currentMediaPlayerStateToMiniPlayerController != null) {
             if(mMusicService != null) {
-                currentMediaplayerStateToMiniPlayerController.passConditionToFragment(mMusicService.getMediaPlayer().isPlaying());
+                currentMediaPlayerStateToMiniPlayerController.passConditionToFragment(mMusicService.getMediaPlayer().isPlaying());
 
             }
 

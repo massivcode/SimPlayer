@@ -27,7 +27,7 @@ public class MiniPlayerControllerFragment extends android.support.v4.app.Fragmen
     public void onAttach(Activity activity){
         super.onAttach(activity);
         Context context = getActivity();
-        ((MainActivity)context).currentMediaplayerStateToMiniPlayerController = this;
+        ((MainActivity)context).currentMediaPlayerStateToMiniPlayerController = this;
     }
 
     @Nullable
