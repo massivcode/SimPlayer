@@ -12,20 +12,45 @@ import com.example.massivcode.simplayer.Database.Model.MusicInfo;
 import com.example.massivcode.simplayer.Util.MusicInfoUtil;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by massivCode on 2015-10-10.
  */
-public class MusicService extends Service {
+public class MusicService extends Service implements MediaPlayer.OnCompletionListener {
 
     public static final String ACTION_START = "ACTION_START";
     public static final String ACTION_PLAY = "ACTION_PLAY";
+    public static final String ACTION_PLAY_NEXT = "ACTION_PLAY_NEXT";
+    public static final String ACTION_PLAY_PREVIOUS = "ACTION_PLAY_PREVIOUS";
     public static final String ACTION_PAUSE = "ACTION_PAUSE";
     public static final String ACTION_RESUME = "ACTION_RESUME";
     private static final String TAG = MusicService.class.getSimpleName();
 
+    private boolean isReady = false;
+
     private final IBinder mBinder = new LocalBinder();
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        mp.pause();
+        mp.reset();
+
+        try {
+            if(mCurrentPosition < getCurrentPlaylistSize()) {
+                mp.setDataSource(getApplicationContext(), mCurrentPlaylist.get(mCurrentPosition + 1));
+            } else {
+                mp.setDataSource(getApplicationContext(), mCurrentPlaylist.get(0));
+            }
+
+            mp.prepare();
+            isReady = true;
+            mp.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public class LocalBinder extends Binder {
         public MusicService getService() {
@@ -35,9 +60,10 @@ public class MusicService extends Service {
     }
 
     private MediaPlayer mMediaPlayer;
-    private Uri mCurrentUri = null;
     private String mAction = null;
     private Map<Uri, MusicInfo> mDataMap;
+    private List<Uri> mCurrentPlaylist;
+    private int mCurrentPosition;
 
     @Override
     public void onCreate() {
@@ -51,6 +77,7 @@ public class MusicService extends Service {
             }
         }).start();
 
+        mMediaPlayer.setOnCompletionListener(this);
 
     }
 
@@ -58,9 +85,18 @@ public class MusicService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         mAction = intent.getAction();
-        if(!mAction.equals(ACTION_PAUSE)) {
-            mCurrentUri = intent.getData();
+
+        switch (mAction) {
+            case ACTION_PLAY:
+                mCurrentPlaylist = intent.getParcelableArrayListExtra("list");
+                mCurrentPosition = intent.getIntExtra("position", 0);
+                break;
+            case ACTION_PLAY_NEXT:
+            case ACTION_PLAY_PREVIOUS:
+                mCurrentPosition = intent.getIntExtra("position", 0);
+                break;
         }
+
 
         switch (mAction) {
             case ACTION_START:
@@ -70,11 +106,15 @@ public class MusicService extends Service {
                     mMediaPlayer.pause();
                     mMediaPlayer.reset();
                     try {
-                        mMediaPlayer.setDataSource(getApplicationContext(), mDataMap.get(mCurrentUri).getUri());
+                        mMediaPlayer.setDataSource(getApplicationContext(), mCurrentPlaylist.get(mCurrentPosition));
                         mMediaPlayer.prepare();
+                        isReady = true;
 
-                        if(communicator != null) {
-                            communicator.transferData(getCurrentInfo());
+                        if(communicatorToMainActivity != null) {
+                            communicatorToMainActivity.transferData(getCurrentInfo());
+                        }
+                        if(communicatorToPlayerActivity != null) {
+                            communicatorToPlayerActivity.transferData(getCurrentInfo());
                         }
 
                         mMediaPlayer.start();
@@ -84,10 +124,14 @@ public class MusicService extends Service {
                 } else {
                     mMediaPlayer.reset();
                     try {
-                        mMediaPlayer.setDataSource(getApplicationContext(), mDataMap.get(mCurrentUri).getUri());
+                        mMediaPlayer.setDataSource(getApplicationContext(), mCurrentPlaylist.get(mCurrentPosition));
                         mMediaPlayer.prepare();
-                        if(communicator != null) {
-                            communicator.transferData(getCurrentInfo());
+                        isReady = true;
+                        if(communicatorToMainActivity != null) {
+                            communicatorToMainActivity.transferData(getCurrentInfo());
+                        }
+                        if(communicatorToPlayerActivity != null) {
+                            communicatorToPlayerActivity.transferData(getCurrentInfo());
                         }
                         mMediaPlayer.start();
                     } catch (IOException e) {
@@ -103,6 +147,83 @@ public class MusicService extends Service {
                 }
                 break;
             case ACTION_RESUME:
+                break;
+            case ACTION_PLAY_NEXT:
+                if(mMediaPlayer.isPlaying()) {
+
+                    mMediaPlayer.stop();
+                    mMediaPlayer.reset();
+                    try {
+                        mMediaPlayer.setDataSource(getApplicationContext(), mCurrentPlaylist.get(mCurrentPosition));
+                        mMediaPlayer.prepare();
+                        isReady = true;
+                        if(communicatorToMainActivity != null) {
+                            communicatorToMainActivity.transferData(getCurrentInfo());
+                        }
+                        if(communicatorToPlayerActivity != null) {
+                            communicatorToPlayerActivity.transferData(getCurrentInfo());
+                        }
+                        mMediaPlayer.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+                    mMediaPlayer.reset();
+                    try {
+                        mMediaPlayer.setDataSource(getApplicationContext(), mCurrentPlaylist.get(mCurrentPosition));
+                        mMediaPlayer.prepare();
+                        isReady = true;
+                        if(communicatorToMainActivity != null) {
+                            communicatorToMainActivity.transferData(getCurrentInfo());
+                        }
+                        if(communicatorToPlayerActivity != null) {
+                            communicatorToPlayerActivity.transferData(getCurrentInfo());
+                        }
+                        mMediaPlayer.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                break;
+            case ACTION_PLAY_PREVIOUS:
+                if(mMediaPlayer.isPlaying()) {
+
+                    mMediaPlayer.stop();
+                    mMediaPlayer.reset();
+                    try {
+                        mMediaPlayer.setDataSource(getApplicationContext(), mCurrentPlaylist.get(mCurrentPosition));
+                        mMediaPlayer.prepare();
+                        isReady = true;
+                        if(communicatorToMainActivity != null) {
+                            communicatorToMainActivity.transferData(getCurrentInfo());
+                        }
+                        if(communicatorToPlayerActivity != null) {
+                            communicatorToPlayerActivity.transferData(getCurrentInfo());
+                        }
+                        mMediaPlayer.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+                    mMediaPlayer.reset();
+                    try {
+                        mMediaPlayer.setDataSource(getApplicationContext(), mCurrentPlaylist.get(mCurrentPosition));
+                        mMediaPlayer.prepare();
+                        isReady = true;
+                        if(communicatorToMainActivity != null) {
+                            communicatorToMainActivity.transferData(getCurrentInfo());
+                        }
+                        if(communicatorToPlayerActivity != null) {
+                            communicatorToPlayerActivity.transferData(getCurrentInfo());
+                        }
+                        mMediaPlayer.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
                 break;
         }
 
@@ -142,20 +263,41 @@ public class MusicService extends Service {
     }
 
     public MusicInfo getCurrentInfo() {
-        return  mDataMap.get(mCurrentUri);
+        if(mCurrentPlaylist != null) {
+            return  mDataMap.get(mCurrentPlaylist.get(mCurrentPosition));
+        } else {
+            return null;
+        }
+
     }
 
     public interface CurrentInfoCommunicator {
-        public void transferData(MusicInfo info);
+        void transferData(MusicInfo info);
     }
 
-    public CurrentInfoCommunicator communicator = null;
+    public CurrentInfoCommunicator communicatorToMainActivity = null;
+    public CurrentInfoCommunicator communicatorToPlayerActivity = null;
 
-    public void setOnCurrentInfoCommunicator(CurrentInfoCommunicator listener) {
-        communicator = listener;
+    public void setOnCurrentInfoToMainActivity(CurrentInfoCommunicator listener) {
+        communicatorToMainActivity = listener;
+    }
+    public void setOnCurrentInfoToPlayerActivity(CurrentInfoCommunicator listener) {
+        communicatorToPlayerActivity = listener;
     }
 
+    public boolean isReady() {
+        return isReady;
+    }
 
+    public Map<Uri, MusicInfo> getDataMap() {
+        return mDataMap;
+    }
 
+    public int getCurrentPosition() {
+        return mCurrentPosition;
+    }
 
+    public int getCurrentPlaylistSize() {
+        return mCurrentPlaylist.size()-1;
+    }
 }

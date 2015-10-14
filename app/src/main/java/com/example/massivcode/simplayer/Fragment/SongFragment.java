@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.example.massivcode.simplayer.Activity.MainActivity;
 import com.example.massivcode.simplayer.Adapter.SongAdapter;
 import com.example.massivcode.simplayer.R;
 import com.example.massivcode.simplayer.Util.MusicInfoUtil;
@@ -43,7 +44,8 @@ public class SongFragment extends Fragment {
         Cursor cursor = getActivity().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, MusicInfoUtil.projection, null, null, null);
         mAdapter = new SongAdapter(getActivity().getApplicationContext(), cursor, true);
         mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener((AdapterView.OnItemClickListener)getActivity());
+        mListView.setOnItemClickListener((AdapterView.OnItemClickListener) getActivity());
+        mPlayAllButton.setOnClickListener((MainActivity)getActivity());
 
     }
 

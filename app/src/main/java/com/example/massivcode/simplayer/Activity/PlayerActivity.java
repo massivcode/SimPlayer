@@ -20,7 +20,7 @@ import com.example.massivcode.simplayer.Util.MusicInfoUtil;
 /**
  * Created by junsuk on 2015. 10. 12..
  */
-public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener {
+public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener, MusicService.CurrentInfoCommunicator {
 
     private static final String TAG = PlayerActivity.class.getSimpleName();
     private TextView mTitleTextView;
@@ -33,18 +33,23 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
     private Button mRepeatButton, mPreviousButton, mPlayButton, mNextButton, mShuffleButton;
 
 
-    private MusicService mService = null;
+    private MusicService mMusicService = null;
     private MusicInfo mMusicInfo;
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+
             MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
-            mService = binder.getService();
-            mSeekBar.setMax(mService.getMediaPlayer().getDuration());
-            if(mService.getMediaPlayer().isPlaying()) {
+            mMusicService = binder.getService();
+
+            mSeekBar.setMax(mMusicService.getMediaPlayer().getDuration());
+
+            if(mMusicService.getMediaPlayer().isPlaying()) {
                 mPlayButton.setSelected(true);
             }
+
+            mMusicService.setOnCurrentInfoToPlayerActivity(PlayerActivity.this);
 
         }
 
@@ -88,8 +93,8 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
 
         mTitleTextView.setText(mMusicInfo.getTitle());
         mArtistTextView.setText(mMusicInfo.getArtist());
-        mAlbumArtImageVIew.setImageBitmap(MusicInfoUtil.getBitmap(this, mMusicInfo.getAlbumArt(), 4));
-        mAlbumArtBigImageView.setImageBitmap(MusicInfoUtil.getBitmap(this, mMusicInfo.getAlbumArt(), 1));
+        mAlbumArtImageVIew.setImageBitmap(MusicInfoUtil.getBitmap(this, mMusicInfo.getUri(), 4));
+        mAlbumArtBigImageView.setImageBitmap(MusicInfoUtil.getBitmap(this, mMusicInfo.getUri(), 1));
         mDurrationTextView.setText(MusicInfoUtil.getTime(mMusicInfo.getDuration()));
 
 
@@ -106,9 +111,9 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (fromUser) {
             mCurrentTimeTextView.setText(MusicInfoUtil.getTime(String.valueOf(progress)));
-            mService.getMediaPlayer().pause();
-            mService.getMediaPlayer().seekTo(progress);
-            mService.getMediaPlayer().start();
+            mMusicService.getMediaPlayer().pause();
+            mMusicService.getMediaPlayer().seekTo(progress);
+            mMusicService.getMediaPlayer().start();
         }
     }
 
@@ -129,14 +134,53 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
                 break;
 
             case R.id.player_previous_btn:
+                if(mMusicService != null & mMusicService.isReady()) {
+
+                    int position = mMusicService.getCurrentPosition();
+
+                    if(position > 0) {
+                        position -= 1;
+                    } else {
+                        position = mMusicService.getCurrentPlaylistSize();
+                    }
+
+                    Intent nextIntent = new Intent(PlayerActivity.this, MusicService.class);
+                    nextIntent.setAction(MusicService.ACTION_PLAY_PREVIOUS);
+                    nextIntent.putExtra("position", position);
+                    startService(nextIntent);
+                }
                 break;
 
             case R.id.player_play_btn:
 
+                Intent pauseIntent = new Intent(PlayerActivity.this, MusicService.class);
+                pauseIntent.setAction(MusicService.ACTION_PAUSE);
+                startService(pauseIntent);
+
+                if(mMusicService.getMediaPlayer().isPlaying()) {
+                    mPlayButton.setSelected(false);
+                } else {
+                    mPlayButton.setSelected(true);
+                }
 
                 break;
 
             case R.id.player_next_btn:
+                if(mMusicService != null & mMusicService.isReady()) {
+
+                    int position = mMusicService.getCurrentPosition();
+
+                    if(position < mMusicService.getCurrentPlaylistSize()) {
+                        position += 1;
+                    } else {
+                        position = 0;
+                    }
+
+                    Intent nextIntent = new Intent(PlayerActivity.this, MusicService.class);
+                    nextIntent.setAction(MusicService.ACTION_PLAY_NEXT);
+                    nextIntent.putExtra("position", position);
+                    startService(nextIntent);
+                }
                 break;
 
             case R.id.player_shuffle_btn:
@@ -155,4 +199,12 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
     }
 
 
+    @Override
+    public void transferData(MusicInfo info) {
+        mTitleTextView.setText(info.getTitle());
+        mArtistTextView.setText(info.getArtist());
+        mAlbumArtImageVIew.setImageBitmap(MusicInfoUtil.getBitmap(this, info.getUri(), 4));
+        mAlbumArtBigImageView.setImageBitmap(MusicInfoUtil.getBitmap(this, info.getUri(), 1));
+        mDurrationTextView.setText(MusicInfoUtil.getTime(info.getDuration()));
+    }
 }

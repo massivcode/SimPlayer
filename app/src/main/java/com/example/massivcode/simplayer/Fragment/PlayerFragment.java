@@ -11,9 +11,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.example.massivcode.simplayer.Database.Model.MusicInfo;
 import com.example.massivcode.simplayer.R;
-import com.example.massivcode.simplayer.Util.MusicInfoUtil;
 
 /**
  * Created by massivCode on 2015-10-10.
@@ -57,14 +55,14 @@ public class PlayerFragment extends android.support.v4.app.Fragment{
         mCurrentTimeTextView = (TextView)view.findViewById(R.id.player_current_time_tv);
         mDurrationTextView = (TextView)view.findViewById(R.id.player_duration_tv);
 
-        if (getArguments() != null) {
-            MusicInfo info = getArguments().getParcelable("info");
-            mTitleTextView.setText(info.getTitle());
-            mArtistTextView.setText(info.getArtist());
-            mAlbumArtImageVIew.setImageBitmap(MusicInfoUtil.getBitmap(getActivity(), info.getAlbumArt(), 4));
-            mAlbumArtBigImageView.setImageBitmap(MusicInfoUtil.getBitmap(getActivity(), info.getAlbumArt(), 1));
-            mDurrationTextView.setText(MusicInfoUtil.getTime(info.getDuration()));
-        }
+//        if (getArguments() != null) {
+//            MusicInfo info = getArguments().getParcelable("info");
+//            mTitleTextView.setText(info.getTitle());
+//            mArtistTextView.setText(info.getArtist());
+//            mAlbumArtImageVIew.setImageBitmap(MusicInfoUtil.getBitmap(getActivity(), info.getAlbumArt(), 4));
+//            mAlbumArtBigImageView.setImageBitmap(MusicInfoUtil.getBitmap(getActivity(), info.getAlbumArt(), 1));
+//            mDurrationTextView.setText(MusicInfoUtil.getTime(info.getDuration()));
+//        }
         return view;
     }
 

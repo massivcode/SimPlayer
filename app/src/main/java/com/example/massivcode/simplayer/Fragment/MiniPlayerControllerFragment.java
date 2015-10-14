@@ -27,8 +27,7 @@ public class MiniPlayerControllerFragment extends android.support.v4.app.Fragmen
     public void onAttach(Activity activity){
         super.onAttach(activity);
         Context context = getActivity();
-        ((MainActivity)context).mediaPlayerStateToFragment = this;
-        Log.d(TAG, "onAttach");
+        ((MainActivity)context).currentMediaplayerStateToMiniPlayerController = this;
     }
 
     @Nullable
@@ -55,9 +54,11 @@ public class MiniPlayerControllerFragment extends android.support.v4.app.Fragmen
     @Override
     public void passConditionToFragment(Boolean mediaIsPlaying) {
         if(mediaIsPlaying) {
-            mMiniPlayerPlayButton.setSelected(false);
+            Log.d(TAG, "is playing");
+            mMiniPlayerPlayButton.setBackgroundResource(R.drawable.ic_av_pause);
         } else {
-            mMiniPlayerPlayButton.setSelected(true);
+            Log.d(TAG, "is playing not");
+            mMiniPlayerPlayButton.setBackgroundResource(R.drawable.ic_av_play_arrow);
         }
     }
 }

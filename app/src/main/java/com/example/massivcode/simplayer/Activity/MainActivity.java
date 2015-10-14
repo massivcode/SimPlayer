@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
@@ -23,6 +24,8 @@ import com.example.massivcode.simplayer.Util.MusicInfoUtil;
 import com.example.massivcode.simplayer.listener.FragmentCommunicator;
 import com.example.massivcode.simplayer.listener.MediaPlayerStateToFragment;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener, MusicService.CurrentInfoCommunicator {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -32,17 +35,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     FragmentTransaction mFragmentTransaction;
 
     Fragment mMainFragment;
-    Fragment mPlayerFragment;
 
     private MusicService mMusicService;
-    private MusicService.CurrentInfoCommunicator mListener;
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
             mMusicService = binder.getService();
-            mMusicService.setOnCurrentInfoCommunicator(MainActivity.this);
+            mMusicService.setOnCurrentInfoToMainActivity(MainActivity.this);
         }
 
         @Override
@@ -51,8 +52,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-    public FragmentCommunicator fragmentCommunicator;
-    public MediaPlayerStateToFragment mediaPlayerStateToFragment;
+    public FragmentCommunicator currentMusicInfoToMiniPlayerInfo;
+    public MediaPlayerStateToFragment currentMediaplayerStateToMiniPlayerController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,30 +80,89 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.mini_player_album_art_iv:
             case R.id.mini_player_artist_tv:
             case R.id.mini_player_title_tv:
-//                mFragmentTransaction = mFragmentManager.beginTransaction();
-//                mFragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-//                mFragmentTransaction.replace(R.id.main_container, mPlayerFragment);
-//                mFragmentTransaction.addToBackStack(null);
-//                mFragmentTransaction.commit();
-//                if(mCurrentInfo != null) {
-//                    Intent intent = new Intent(this, PlayerActivity.class);
-//                    intent.putExtra("info", mCurrentInfo);
-//                    startActivity(intent);
-//                }
+                if(mMusicService.getCurrentInfo() != null) {
+                    Intent intent = new Intent(this, PlayerActivity.class);
+                    intent.putExtra("info", mMusicService.getCurrentInfo());
+                    startActivity(intent);
+                }
                 break;
 
             case R.id.mini_player_previous_btn:
                 Toast.makeText(MainActivity.this, "이전 버튼이 눌렸습니다.", Toast.LENGTH_SHORT).show();
+
+                if(mMusicService != null & mMusicService.isReady()) {
+
+                    int position = mMusicService.getCurrentPosition();
+
+                    if(position > 0) {
+                        position -= 1;
+                    } else {
+                        position = mMusicService.getCurrentPlaylistSize();
+                    }
+
+                    Intent nextIntent = new Intent(MainActivity.this, MusicService.class);
+                    nextIntent.setAction(MusicService.ACTION_PLAY_PREVIOUS);
+                    nextIntent.putExtra("position", position);
+                    startService(nextIntent);
+                }
+
+
                 break;
             case R.id.mini_player_play_btn:
-                Intent pauseIntent = new Intent(MainActivity.this, MusicService.class);
-                pauseIntent.setAction(MusicService.ACTION_PAUSE);
-                startService(pauseIntent);
+                if(currentMediaplayerStateToMiniPlayerController != null) {
+                    if (mMusicService != null & mMusicService.isReady()) {
+                        if(mMusicService.getMediaPlayer().isPlaying()) {
+                            currentMediaplayerStateToMiniPlayerController.passConditionToFragment(false);
+                        } else {
+                            currentMediaplayerStateToMiniPlayerController.passConditionToFragment(true);
+                        }
+
+                    }
+                }
+
+                if(mMusicService != null & mMusicService.isReady()) {
+                    Intent pauseIntent = new Intent(MainActivity.this, MusicService.class);
+                    pauseIntent.setAction(MusicService.ACTION_PAUSE);
+                    startService(pauseIntent);
+                }
                 break;
             case R.id.mini_player_next_btn:
                 Toast.makeText(MainActivity.this, "다음 버튼이 눌렸습니다.", Toast.LENGTH_SHORT).show();
-                break;
 
+                if(mMusicService != null & mMusicService.isReady()) {
+
+                    int position = mMusicService.getCurrentPosition();
+
+                    Log.d(TAG, "list size = " + mMusicService.getCurrentPlaylistSize());
+                    if(position < mMusicService.getCurrentPlaylistSize()) {
+                        position += 1;
+                    } else {
+                        position = 0;
+                    }
+
+                    Intent nextIntent = new Intent(MainActivity.this, MusicService.class);
+                    nextIntent.setAction(MusicService.ACTION_PLAY_NEXT);
+                    nextIntent.putExtra("position", position);
+                    startService(nextIntent);
+                }
+
+                break;
+            case R.id.song_play_ll:
+                Toast.makeText(MainActivity.this, "모두 재생 눌림", Toast.LENGTH_SHORT).show();
+                Intent playAllIntent = new Intent(MainActivity.this, MusicService.class);
+                playAllIntent.setAction(MusicService.ACTION_PLAY);
+                playAllIntent.putExtra("list", MusicInfoUtil.makePlaylist(mMusicService.getDataMap()));
+                playAllIntent.putExtra("position", 0);
+                startService(playAllIntent);
+
+                if(currentMediaplayerStateToMiniPlayerController != null) {
+                    if (mMusicService != null) {
+                        currentMediaplayerStateToMiniPlayerController.passConditionToFragment(true);
+
+                    }
+                }
+
+                break;
         }
     }
 
@@ -110,17 +170,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         MusicInfo info = MusicInfoUtil.getSelectedMusicInfo(MainActivity.this, (Cursor) parent.getAdapter().getItem(position));
-        Uri uri = info.getUri();
+        ArrayList<Uri> list = MusicInfoUtil.makePlaylist(info);
         Intent intent = new Intent(MainActivity.this, MusicService.class);
         intent.setAction(MusicService.ACTION_PLAY);
-        intent.setData(uri);
+        intent.putExtra("list", list);
+        intent.putExtra("position", 0);
         startService(intent);
 
-        if(mediaPlayerStateToFragment != null) {
-            mediaPlayerStateToFragment.passConditionToFragment(mMusicService.getMediaPlayer().isPlaying());
+        if(currentMediaplayerStateToMiniPlayerController != null) {
+            if (mMusicService != null) {
+                currentMediaplayerStateToMiniPlayerController.passConditionToFragment(true);
+
+            }
         }
 
     }
+
 
     @Override
     protected void onDestroy() {
@@ -130,8 +195,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void transferData(MusicInfo info) {
-        if (fragmentCommunicator != null) {
-            fragmentCommunicator.passDataToFragment(info);
+        if (currentMusicInfoToMiniPlayerInfo != null) {
+            currentMusicInfoToMiniPlayerInfo.passDataToFragment(info);
+        }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        if(currentMediaplayerStateToMiniPlayerController != null) {
+            if(mMusicService != null) {
+
+                currentMediaplayerStateToMiniPlayerController.passConditionToFragment(mMusicService.getMediaPlayer().isPlaying());
+            }
+
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(currentMediaplayerStateToMiniPlayerController != null) {
+            if(mMusicService != null) {
+                currentMediaplayerStateToMiniPlayerController.passConditionToFragment(mMusicService.getMediaPlayer().isPlaying());
+
+            }
+
         }
     }
 }

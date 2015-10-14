@@ -32,7 +32,7 @@ public class MiniPlayerInfoFragment extends android.support.v4.app.Fragment impl
     public void onAttach(Activity activity){
         super.onAttach(activity);
         Context context = getActivity();
-        ((MainActivity)context).fragmentCommunicator = this;
+        ((MainActivity)context).currentMusicInfoToMiniPlayerInfo = this;
         Log.d(TAG, "onAttach");
     }
 
@@ -75,10 +75,11 @@ public class MiniPlayerInfoFragment extends android.support.v4.app.Fragment impl
     @Override
     public void passDataToFragment(MusicInfo info) {
         mMusicInfo = info;
+
         Log.d(TAG, ""+info);
         mMiniPlayerTitleTextView.setText(mMusicInfo.getTitle());
         mMiniPlayerArtistTextView.setText(mMusicInfo.getArtist());
-        mMiniPlayerAlbumArtImageView.setImageBitmap(MusicInfoUtil.getBitmap(getActivity(), mMusicInfo.getAlbumArt(), 4));
+        mMiniPlayerAlbumArtImageView.setImageBitmap(MusicInfoUtil.getBitmap(getActivity(), mMusicInfo.getUri(), 4));
     }
 
 
