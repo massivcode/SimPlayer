@@ -4,8 +4,10 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -43,13 +45,13 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
             MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
             mMusicService = binder.getService();
 
-            mSeekBar.setMax(mMusicService.getMediaPlayer().getDuration());
 
             if(mMusicService.getMediaPlayer().isPlaying()) {
                 mPlayButton.setSelected(true);
             }
 
             mMusicService.setOnCurrentInfoToPlayerActivity(PlayerActivity.this);
+            new Timer(mMusicService.getMediaPlayer().getDuration(), 1000).start();
 
         }
 
@@ -100,7 +102,6 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
 
 
         mSeekBar.setOnSeekBarChangeListener(this);
-
 
 
 
@@ -201,10 +202,39 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
 
     @Override
     public void transferData(MusicInfo info) {
+        mMusicInfo = info;
         mTitleTextView.setText(info.getTitle());
         mArtistTextView.setText(info.getArtist());
         mAlbumArtImageVIew.setImageBitmap(MusicInfoUtil.getBitmap(this, info.getUri(), 4));
         mAlbumArtBigImageView.setImageBitmap(MusicInfoUtil.getBitmap(this, info.getUri(), 1));
         mDurrationTextView.setText(MusicInfoUtil.getTime(info.getDuration()));
     }
+
+    public class Timer extends CountDownTimer {
+
+        /**
+         * @param millisInFuture    The number of millis in the future from the call
+         *                          to {@link #start()} until the countdown is done and {@link #onFinish()}
+         *                          is called.
+         * @param countDownInterval The interval along the way to receive
+         *                          {@link #onTick(long)} callbacks.
+         */
+        public Timer(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            Log.d(TAG, "현재 위치 : " + mMusicService.getMediaPlayer().getCurrentPosition() + "\r\n음원 길이 : " + mMusicService.getMediaPlayer().getDuration());
+            mCurrentTimeTextView.setText(MusicInfoUtil.getTime(String.valueOf(mMusicService.getMediaPlayer().getCurrentPosition())));
+            mSeekBar.setMax(mMusicService.getMediaPlayer().getDuration());
+            mSeekBar.setProgress(mMusicService.getMediaPlayer().getCurrentPosition());
+        }
+
+        @Override
+        public void onFinish() {
+
+        }
+    }
+
 }

@@ -127,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case R.id.mini_player_next_btn:
-                Toast.makeText(MainActivity.this, "다음 버튼이 눌렸습니다.", Toast.LENGTH_SHORT).show();
 
                 if(mMusicService != null & mMusicService.isReady()) {
 
@@ -148,7 +147,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 break;
             case R.id.song_play_ll:
-                Toast.makeText(MainActivity.this, "모두 재생 눌림", Toast.LENGTH_SHORT).show();
                 Intent playAllIntent = new Intent(MainActivity.this, MusicService.class);
                 playAllIntent.setAction(MusicService.ACTION_PLAY);
                 playAllIntent.putExtra("list", MusicInfoUtil.makePlaylist(mMusicService.getDataMap()));

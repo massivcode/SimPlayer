@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.massivcode.simplayer.Database.Model.MusicInfo;
 import com.example.massivcode.simplayer.Util.MusicInfoUtil;
@@ -20,13 +21,12 @@ import java.util.Map;
  */
 public class MusicService extends Service implements MediaPlayer.OnCompletionListener {
 
-    public static final String ACTION_START = "ACTION_START";
+    private static final String TAG = MusicService.class.getSimpleName();
+
     public static final String ACTION_PLAY = "ACTION_PLAY";
     public static final String ACTION_PLAY_NEXT = "ACTION_PLAY_NEXT";
     public static final String ACTION_PLAY_PREVIOUS = "ACTION_PLAY_PREVIOUS";
     public static final String ACTION_PAUSE = "ACTION_PAUSE";
-    public static final String ACTION_RESUME = "ACTION_RESUME";
-    private static final String TAG = MusicService.class.getSimpleName();
 
     private boolean isReady = false;
 
@@ -34,22 +34,29 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        mp.pause();
-        mp.reset();
+            int lastPosition = mp.getCurrentPosition();
+            int duration = mp.getDuration();
 
-        try {
-            if(mCurrentPosition < getCurrentPlaylistSize()) {
-                mp.setDataSource(getApplicationContext(), mCurrentPlaylist.get(mCurrentPosition + 1));
-            } else {
-                mp.setDataSource(getApplicationContext(), mCurrentPlaylist.get(0));
+            mp.pause();
+            mp.reset();
+
+            try {
+                if(mCurrentPosition < getCurrentPlaylistSize()) {
+                    mCurrentPosition += 1;
+                    mp.setDataSource(getApplicationContext(), mCurrentPlaylist.get(mCurrentPosition));
+                } else {
+                    mp.setDataSource(getApplicationContext(), mCurrentPlaylist.get(0));
+                }
+
+
+                mp.prepare();
+                isReady = true;
+                mp.start();
+                sendMessage();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
-            mp.prepare();
-            isReady = true;
-            mp.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public class LocalBinder extends Binder {
@@ -99,8 +106,6 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
 
 
         switch (mAction) {
-            case ACTION_START:
-                break;
             case ACTION_PLAY:
                 if(mMediaPlayer.isPlaying()) {
                     mMediaPlayer.pause();
@@ -110,12 +115,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                         mMediaPlayer.prepare();
                         isReady = true;
 
-                        if(communicatorToMainActivity != null) {
-                            communicatorToMainActivity.transferData(getCurrentInfo());
-                        }
-                        if(communicatorToPlayerActivity != null) {
-                            communicatorToPlayerActivity.transferData(getCurrentInfo());
-                        }
+                        sendMessage();
 
                         mMediaPlayer.start();
                     } catch (IOException e) {
@@ -127,12 +127,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                         mMediaPlayer.setDataSource(getApplicationContext(), mCurrentPlaylist.get(mCurrentPosition));
                         mMediaPlayer.prepare();
                         isReady = true;
-                        if(communicatorToMainActivity != null) {
-                            communicatorToMainActivity.transferData(getCurrentInfo());
-                        }
-                        if(communicatorToPlayerActivity != null) {
-                            communicatorToPlayerActivity.transferData(getCurrentInfo());
-                        }
+                        sendMessage();
                         mMediaPlayer.start();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -146,8 +141,6 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                     mMediaPlayer.start();
                 }
                 break;
-            case ACTION_RESUME:
-                break;
             case ACTION_PLAY_NEXT:
                 if(mMediaPlayer.isPlaying()) {
 
@@ -157,12 +150,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                         mMediaPlayer.setDataSource(getApplicationContext(), mCurrentPlaylist.get(mCurrentPosition));
                         mMediaPlayer.prepare();
                         isReady = true;
-                        if(communicatorToMainActivity != null) {
-                            communicatorToMainActivity.transferData(getCurrentInfo());
-                        }
-                        if(communicatorToPlayerActivity != null) {
-                            communicatorToPlayerActivity.transferData(getCurrentInfo());
-                        }
+                        sendMessage();
                         mMediaPlayer.start();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -174,12 +162,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                         mMediaPlayer.setDataSource(getApplicationContext(), mCurrentPlaylist.get(mCurrentPosition));
                         mMediaPlayer.prepare();
                         isReady = true;
-                        if(communicatorToMainActivity != null) {
-                            communicatorToMainActivity.transferData(getCurrentInfo());
-                        }
-                        if(communicatorToPlayerActivity != null) {
-                            communicatorToPlayerActivity.transferData(getCurrentInfo());
-                        }
+                        sendMessage();
                         mMediaPlayer.start();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -196,12 +179,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                         mMediaPlayer.setDataSource(getApplicationContext(), mCurrentPlaylist.get(mCurrentPosition));
                         mMediaPlayer.prepare();
                         isReady = true;
-                        if(communicatorToMainActivity != null) {
-                            communicatorToMainActivity.transferData(getCurrentInfo());
-                        }
-                        if(communicatorToPlayerActivity != null) {
-                            communicatorToPlayerActivity.transferData(getCurrentInfo());
-                        }
+                        sendMessage();
                         mMediaPlayer.start();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -213,12 +191,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                         mMediaPlayer.setDataSource(getApplicationContext(), mCurrentPlaylist.get(mCurrentPosition));
                         mMediaPlayer.prepare();
                         isReady = true;
-                        if(communicatorToMainActivity != null) {
-                            communicatorToMainActivity.transferData(getCurrentInfo());
-                        }
-                        if(communicatorToPlayerActivity != null) {
-                            communicatorToPlayerActivity.transferData(getCurrentInfo());
-                        }
+                        sendMessage();
                         mMediaPlayer.start();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -231,6 +204,15 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
 
 
         return START_STICKY;
+    }
+
+    private void sendMessage() {
+        if(communicatorToMainActivity != null) {
+            communicatorToMainActivity.transferData(getCurrentInfo());
+        }
+        if(communicatorToPlayerActivity != null) {
+            communicatorToPlayerActivity.transferData(getCurrentInfo());
+        }
     }
 
     @Override
@@ -264,8 +246,10 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
 
     public MusicInfo getCurrentInfo() {
         if(mCurrentPlaylist != null) {
+            Log.d(TAG, "case1");
             return  mDataMap.get(mCurrentPlaylist.get(mCurrentPosition));
         } else {
+            Log.d(TAG, "case2");
             return null;
         }
 

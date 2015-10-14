@@ -60,7 +60,6 @@ public class MusicInfoUtil {
         byte[] albumArt = retriever.getEmbeddedPicture();
 
         musicInfo = new MusicInfo(_id, uri, artist, title, album, albumArt, duration);
-        cursor.close();
 
         return musicInfo;
 
