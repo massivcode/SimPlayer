@@ -1,15 +1,19 @@
 package com.example.massivcode.simplayer.Activity;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -59,6 +63,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        checkPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, 1);
+
         mServiceIntent = new Intent(MainActivity.this, MusicService.class);
         bindService(mServiceIntent, mConnection, BIND_AUTO_CREATE);
 
@@ -220,5 +227,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
         }
+    }
+
+    private void checkPermissions(String permission, int userPermission) {
+
+        if (ContextCompat.checkSelfPermission(this, permission)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // 권한 체크 화면 보여주기
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
+                // 사용자가 이전에 거부를 했을 경우
+                ActivityCompat.requestPermissions(this, new String[]{permission}, userPermission);
+            } else {
+                // 권한이 없을 때 권한 요청
+                ActivityCompat.requestPermissions(this, new String[]{permission}, userPermission);
+            }
+        }
+        // 사용자가 이전에 승인을 했을 경우
+        else {
+            Log.d(TAG, "사용자가 이전에 승인을 했을 경우");
+        }
+
     }
 }
